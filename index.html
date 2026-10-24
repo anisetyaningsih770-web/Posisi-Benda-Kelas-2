@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Petualangan Menata Rumah – Belajar Mengenal Posisi Benda</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:'Fredoka','Nunito','Quicksand','Comic Neue','Comic Sans MS','Trebuchet MS',Arial,sans-serif;background:linear-gradient(160deg,#E0F2FE 0%,#ECFDF5 100%);background-attachment:fixed;min-height:100vh;color:#334155;font-size:18px;-webkit-tap-highlight-color:transparent}
+.hidden{display:none!important}
+.ribbon{background:linear-gradient(90deg,#7C3AED,#2563EB);color:#fff;text-align:center;padding:8px 12px;font-weight:700;font-size:15px;letter-spacing:.3px;box-shadow:0 3px 8px rgba(37,99,235,.25)}
+header.top{text-align:center;padding:14px 10px 2px}
+.title{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+.title svg{animation:bounce 2.4s ease-in-out infinite}
+h1{margin:0;font-size:clamp(24px,5vw,40px);color:#0F766E;line-height:1.1;text-shadow:0 2px 0 #fff}
+.sub{margin:6px 0 0;font-size:clamp(14px,2.6vw,18px);color:#475569;font-weight:600}
+main{max-width:1000px;margin:0 auto;padding:10px 12px 40px}
+.card{background:#fff;border-radius:28px;box-shadow:0 8px 24px rgba(15,118,110,.12);padding:20px}
+
+/* tombol 3D */
+.btn{--bg:#10B981;--sh:#047857;font-family:inherit;font-weight:700;border:none;border-radius:20px;padding:14px 26px;font-size:20px;color:#fff;cursor:pointer;background:var(--bg);box-shadow:0 6px 0 var(--sh);transition:transform .08s,box-shadow .08s;line-height:1.2}
+.btn:hover:not(:disabled){filter:brightness(1.06)}
+.btn:active:not(:disabled){transform:translateY(2px);box-shadow:0 4px 0 var(--sh)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.green{--bg:#10B981;--sh:#047857}
+.btn.blue{--bg:#0EA5E9;--sh:#0369A1}
+.btn.amber{--bg:#F59E0B;--sh:#B45309}
+.btn.big{font-size:26px;padding:18px 34px}
+.btn.small{font-size:16px;padding:9px 16px;border-radius:14px;box-shadow:0 4px 0 var(--sh)}
+
+/* layar awal */
+.start{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:center}
+@media(max-width:760px){.start{grid-template-columns:1fr}}
+.start .art{text-align:center}
+.start .art svg{width:100%;max-width:380px;height:auto}
+.start h2{margin:0 0 6px;color:#7C3AED;font-size:26px}
+.start p{margin:0 0 14px;line-height:1.45}
+.namebox{width:100%;padding:16px 18px;font-size:22px;font-family:inherit;border:4px solid #C4B5FD;border-radius:20px;outline:none;background:#FAF5FF;color:#334155;margin-bottom:16px}
+.namebox:focus{border-color:#7C3AED;box-shadow:0 0 0 5px rgba(124,58,237,.18)}
+.btnstack{display:flex;flex-direction:column;gap:14px}
+.btnstack .btn{width:100%}
+
+/* status */
+.status{padding:12px 14px;margin-bottom:12px;background:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.chip{background:#EDE9FE;border-radius:999px;padding:6px 14px;font-weight:700;font-size:16px;white-space:nowrap}
+.chip.y{background:#FEF3C7}.chip.c{background:#FFE4E6}.chip.g{background:#D1FAE5}.chip.b{background:#E0F2FE}
+.progress{height:12px;background:#E2E8F0;border-radius:999px;margin-top:10px;overflow:hidden}
+.progress>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#34D399,#0EA5E9);border-radius:999px;transition:width .4s}
+
+/* misi */
+.mission{background:#FEF3C7;border:4px solid #FCD34D;border-radius:24px;padding:14px 18px;margin-bottom:12px;text-align:center;animation:fadeIn .5s}
+.mission small{display:block;color:#B45309;font-weight:700;font-size:15px;margin-bottom:2px}
+.mission .txt{font-size:clamp(20px,3.8vw,30px);font-weight:700;line-height:1.3;color:#334155}
+.kw{background:#fff;color:#7C3AED;border-radius:10px;padding:0 8px;box-shadow:inset 0 -4px 0 #DDD6FE}
+
+.stage{position:relative;background:#fff;border-radius:26px;padding:6px;box-shadow:0 8px 22px rgba(14,165,233,.18)}
+#room{display:block;width:100%;height:auto;max-height:58vh;border-radius:20px;touch-action:manipulation}
+#room.sel{cursor:pointer}
+.toast{position:absolute;left:50%;top:14px;transform:translateX(-50%);background:#7C3AED;color:#fff;padding:8px 20px;border-radius:999px;font-weight:700;box-shadow:0 5px 0 #5B21B6;animation:toastIn 2.2s forwards;pointer-events:none;z-index:5;text-align:center}
+@keyframes toastIn{0%{opacity:0;transform:translate(-50%,-14px)}12%{opacity:1;transform:translate(-50%,0)}80%{opacity:1}100%{opacity:0}}
+
+.fbslot{min-height:8px}
+.fb{margin:12px 0 4px;border-radius:22px;padding:14px 18px;text-align:center;animation:pop .4s}
+.fb.ok{background:#D1FAE5;border:4px solid #34D399}
+.fb.ok .badge{display:inline-block;background:#10B981;color:#fff;font-size:clamp(20px,4vw,28px);font-weight:700;border-radius:999px;padding:8px 24px;box-shadow:0 5px 0 #047857;animation:bounce .8s}
+.fb.bad{background:linear-gradient(135deg,#FFEDD5,#FEF3C7);border:4px solid #FB923C}
+.fb.bad .msg{font-size:clamp(18px,3.4vw,24px);font-weight:700;line-height:1.4;color:#9A3412;margin-bottom:10px}
+.fb .bar{height:8px;border-radius:99px;background:#FED7AA;margin-top:12px;overflow:hidden}
+.fb .bar i{display:block;height:100%;background:#F97316;width:100%;animation:shrink 3.5s linear forwards}
+@keyframes shrink{to{width:0}}
+
+.traywrap{margin-top:12px}
+.tray{background:#FEF3C7;border:4px dashed #F59E0B;border-radius:26px;padding:12px;display:flex;align-items:center;justify-content:center;gap:18px;min-height:140px;flex-wrap:wrap}
+.tray .lbl{font-weight:700;color:#B45309;font-size:16px;text-align:center}
+.titem{touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;background:#fff;border-radius:22px;padding:8px 18px 6px;display:flex;flex-direction:column;align-items:center;box-shadow:0 6px 0 #FCD34D;border:4px solid transparent;animation:wiggle 2.5s ease-in-out infinite}
+.titem:active{cursor:grabbing}
+.titem .nm{font-weight:700;font-size:16px;margin-top:-2px}
+.titem.selected{border-color:#7C3AED;background:#F5F3FF;animation:pulse 1s ease-in-out infinite}
+.titem.dragging{opacity:.35;animation:none}
+.titem.gone{animation:none;opacity:0;transform:scale(.4);transition:all .35s}
+.ghost{position:fixed;pointer-events:none;z-index:999;transform:translate(-50%,-50%) scale(1.2);filter:drop-shadow(0 10px 8px rgba(0,0,0,.25))}
+.hint{text-align:center;font-weight:700;color:#7C3AED;margin-top:8px;font-size:17px;min-height:24px}
+.gamebar{display:flex;justify-content:space-between;gap:10px;margin-top:10px}
+
+/* svg animasi */
+.pop{transform-box:fill-box;transform-origin:center;animation:popin .45s ease-out}
+.cloud{animation:drift 9s ease-in-out infinite alternate}
+.glow{animation:pulse 2.8s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.zonehint{animation:zonepulse 1s ease-in-out infinite}
+.sway{transform-box:fill-box;transform-origin:50% 100%;animation:sway 3.5s ease-in-out infinite alternate}
+@keyframes popin{0%{transform:scale(.3);opacity:0}70%{transform:scale(1.15);opacity:1}100%{transform:scale(1)}}
+@keyframes drift{from{transform:translateX(-12px)}to{transform:translateX(16px)}}
+@keyframes zonepulse{0%,100%{opacity:.5}50%{opacity:1}}
+@keyframes sway{from{transform:rotate(-2deg)}to{transform:rotate(2deg)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-2deg)}75%{transform:rotate(2deg)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(.85);opacity:0}100%{transform:scale(1);opacity:1}}
+
+/* hasil */
+.end{text-align:center}
+.end h2{font-size:clamp(24px,5vw,34px);color:#7C3AED;margin:6px 0}
+.end .msg{font-size:20px;line-height:1.5;max-width:640px;margin:8px auto 14px}
+.stars{display:flex;justify-content:center;gap:6px;margin:10px 0}
+.stars svg{width:96px;height:96px;opacity:0;animation:popin .6s forwards}
+.stars svg.on{filter:drop-shadow(0 0 12px #FBBF24)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:14px 0}
+.stat{border-radius:22px;padding:14px}
+.stat b{display:block;font-size:30px}
+.stat span{font-size:15px;font-weight:700;color:#64748B}
+.end .row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(30,41,59,.55);z-index:500;display:flex;align-items:center;justify-content:center;padding:12px;animation:fadeIn .25s}
+.panel{background:#F8FAFC;border-radius:30px;max-width:980px;width:100%;max-height:92vh;overflow:auto;padding:18px 20px 22px;position:relative;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.panel h2{margin:0 0 4px;color:#0F766E;font-size:clamp(22px,4.5vw,30px);text-align:center}
+.panel .lead{text-align:center;margin:0 0 14px;color:#475569}
+.closebar{display:flex;justify-content:center;margin-top:16px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.pc{border-radius:24px;padding:12px;text-align:center;border:3px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,.06)}
+.pc:nth-child(4n+1){background:#FEF3C7}.pc:nth-child(4n+2){background:#FFE4E6}.pc:nth-child(4n+3){background:#EDE9FE}.pc:nth-child(4n+4){background:#D1FAE5}
+.pc .no{display:inline-block;background:#7C3AED;color:#fff;border-radius:999px;min-width:30px;height:30px;line-height:30px;font-weight:700;margin-right:6px}
+.pc h3{margin:0;font-size:22px;color:#334155;display:inline}
+.pc svg{display:block;width:100%;height:auto;max-height:140px;margin:8px 0;background:#fff;border-radius:16px}
+.pc p{margin:4px 0;font-size:16px;line-height:1.4}
+.pc .ex{background:#fff;border-radius:12px;padding:6px 10px;font-weight:700;color:#7C3AED}
+
+/* papan peringkat */
+.lbwrap{overflow:auto;border-radius:20px;border:4px solid #7C3AED;background:#fff}
+table.lb{width:100%;border-collapse:collapse;min-width:540px}
+.lb th{background:linear-gradient(180deg,#8B5CF6,#6D28D9);color:#fff;padding:12px 10px;font-size:16px;text-align:left}
+.lb td{padding:10px;border-bottom:2px solid #EDE9FE;font-weight:600;font-size:17px}
+.lb tr:nth-child(even) td{background:#FAF5FF}
+.lb tr.r1 td{background:#FEF9C3}.lb tr.r2 td{background:#F1F5F9}.lb tr.r3 td{background:#FFEDD5}
+.medal{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;font-weight:700;color:#fff;box-shadow:inset 0 -3px 0 rgba(0,0,0,.2),0 2px 4px rgba(0,0,0,.2)}
+.medal.m1{background:radial-gradient(circle at 30% 30%,#FDE047,#D97706)}
+.medal.m2{background:radial-gradient(circle at 30% 30%,#F1F5F9,#94A3B8)}
+.medal.m3{background:radial-gradient(circle at 30% 30%,#FDBA74,#9A3412)}
+.empty{padding:34px 12px;text-align:center;color:#64748B;font-weight:700}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:900}
+</style>
+</head>
+<body>
+<div class="ribbon">Dibuat oleh: Ani Setyaningsih | Matematika Fase A Kelas 2 SD</div>
+<header class="top">
+  <div class="title">
+    <svg width="64" height="64" viewBox="0 0 100 100" aria-hidden="true">
+      <polygon points="50,8 94,48 6,48" fill="#F87171"/>
+      <rect x="16" y="46" width="68" height="46" rx="6" fill="#FDE68A"/>
+      <rect x="42" y="62" width="18" height="30" rx="4" fill="#92400E"/>
+      <rect x="22" y="56" width="16" height="16" rx="3" fill="#BAE6FD" stroke="#fff" stroke-width="2"/>
+      <rect x="66" y="56" width="14" height="16" rx="3" fill="#BAE6FD" stroke="#fff" stroke-width="2"/>
+      <circle cx="50" cy="38" r="7" fill="#FEF3C7"/>
+      <path d="M45 40 q5 5 10 0" stroke="#92400E" stroke-width="2" fill="none"/>
+    </svg>
+    <h1>Petualangan Menata Rumah</h1>
+  </div>
+  <p class="sub">Belajar Mengenal Posisi Benda • Materi oleh Ani Setyaningsih</p>
+</header>
+
+<main>
+  <!-- LAYAR AWAL -->
+  <section id="screenStart" class="card start">
+    <div class="art">
+      <svg viewBox="0 0 400 300" aria-hidden="true">
+        <rect x="0" y="230" width="400" height="70" rx="20" fill="#BBF7D0"/>
+        <g class="cloud"><ellipse cx="70" cy="50" rx="40" ry="16" fill="#fff"/><ellipse cx="95" cy="42" rx="26" ry="14" fill="#fff"/></g>
+        <circle cx="340" cy="50" r="26" fill="#FDE047"/>
+        <polygon points="200,40 340,140 60,140" fill="#FB7185"/>
+        <rect x="80" y="135" width="240" height="100" rx="10" fill="#FEF3C7"/>
+        <rect x="180" y="165" width="42" height="70" rx="8" fill="#92400E"/>
+        <rect x="105" y="158" width="48" height="42" rx="8" fill="#BAE6FD" stroke="#fff" stroke-width="5"/>
+        <rect x="250" y="158" width="48" height="42" rx="8" fill="#BAE6FD" stroke="#fff" stroke-width="5"/>
+        <circle cx="200" cy="95" r="16" fill="#fff"/>
+        <path d="M190 96 q10 10 20 0" stroke="#92400E" stroke-width="3" fill="none"/>
+        <circle cx="194" cy="90" r="2.5" fill="#92400E"/><circle cx="206" cy="90" r="2.5" fill="#92400E"/>
+        <ellipse cx="330" cy="235" rx="22" ry="14" fill="#22C55E"/><rect x="326" y="245" width="8" height="20" fill="#92400E"/>
+      </svg>
+    </div>
+    <div>
+      <h2>Halo, Teman Hebat! 👋</h2>
+      <p>Bantu menata rumah dengan menaruh benda di posisi yang tepat. Siapa namamu?</p>
+      <input id="inName" class="namebox" type="text" maxlength="30" autocomplete="off" placeholder="Ketik nama lengkapmu di sini...">
+      <div class="btnstack">
+        <button id="btnStart" class="btn green big" disabled>🏠 Mulai Berpetualang</button>
+        <button id="btnMateri" class="btn blue">📖 Pelajari Materi Posisi</button>
+        <button id="btnLB" class="btn amber">🏆 Papan Peringkat</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAYAR GAME -->
+  <section id="screenGame" class="hidden">
+    <div class="card status">
+      <div class="chips">
+        <div class="chip">🧒 <span id="sName"></span></div>
+        <div class="chip y">🏠 <span id="sRoom"></span></div>
+        <div class="chip b">📋 Soal <span id="sNo">1</span> dari <span id="sTot">15</span></div>
+        <div class="chip g">⭐ Skor: <span id="sScore">0</span></div>
+        <div class="chip c">⏱ <span id="sTime">00:00</span></div>
+      </div>
+      <div class="progress"><i id="prog"></i></div>
+    </div>
+    <div class="mission"><small>🎯 Misi Kamu</small><div class="txt" id="missionTxt"></div></div>
+    <div class="stage">
+      <svg id="room" viewBox="0 0 960 600" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Ruangan"></svg>
+    </div>
+    <div class="fbslot" id="fbslot"></div>
+    <div class="traywrap">
+      <div class="tray">
+        <div class="lbl">Nampan<br>Benda Misi</div>
+        <div id="trayItem"></div>
+      </div>
+      <div class="hint" id="hint"></div>
+    </div>
+    <div class="gamebar">
+      <button id="btnExit" class="btn small amber">⬅ Keluar</button>
+      <button id="btnMute" class="btn small blue">🔊 Suara: Hidup</button>
+    </div>
+  </section>
+
+  <!-- LAYAR HASIL -->
+  <section id="screenEnd" class="card end hidden"></section>
+</main>
+
+<!-- MODAL MATERI -->
+<div id="modalMateri" class="modal hidden">
+  <div class="panel">
+    <h2>📖 Mengenal Posisi Benda</h2>
+    <p class="lead">Ada 10 kata posisi. Ayo kenali satu per satu!</p>
+    <div class="cards" id="cardsMateri"></div>
+    <div class="closebar"><button class="btn green" data-close="modalMateri">Tutup ✕</button></div>
+  </div>
+</div>
+
+<!-- MODAL PERINGKAT -->
+<div id="modalLB" class="modal hidden">
+  <div class="panel">
+    <h2>🏆 Papan Peringkat</h2>
+    <p class="lead">Nilai terbaik setiap murid ditampilkan di sini.</p>
+    <div id="lbBody"></div>
+    <div class="closebar"><button class="btn green" data-close="modalLB">Tutup ✕</button></div>
+  </div>
+</div>
+
+<canvas id="confetti"></canvas>
+
+<script>
+(function () {
+  'use strict';
+
+  var $ = function (id) { return document.getElementById(id); };
+  var KEY = 'math_spasial_leaderboard';
+
+  /* ==================== ILUSTRASI BENDA (kotak 100x100) ==================== */
+  var ART = {
+    bantal: '<rect x="8" y="22" width="84" height="56" rx="24" fill="#FDA4AF" stroke="#FB7185" stroke-width="3"/><path d="M30 40 q20 8 40 0" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="50" cy="52" r="4" fill="#fff"/>',
+    bantal2: '<rect x="8" y="22" width="84" height="56" rx="24" fill="#FDE68A" stroke="#F59E0B" stroke-width="3"/><path d="M30 40 q20 8 40 0" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="50" cy="52" r="4" fill="#fff"/>',
+    bola: '<circle cx="50" cy="50" r="38" fill="#EF4444"/><path d="M14 38 Q50 64 86 38 L88 52 Q50 78 12 52 Z" fill="#fff"/><circle cx="36" cy="30" r="7" fill="rgba(255,255,255,.55)"/>',
+    pot: '<path d="M28 58 L72 58 L66 92 L34 92 Z" fill="#EA580C"/><rect x="24" y="52" width="52" height="10" rx="4" fill="#C2410C"/><ellipse cx="50" cy="36" rx="13" ry="22" fill="#22C55E"/><ellipse cx="32" cy="44" rx="9" ry="18" fill="#16A34A" transform="rotate(-30 32 44)"/><ellipse cx="68" cy="44" rx="9" ry="18" fill="#16A34A" transform="rotate(30 68 44)"/>',
+    karpet: '<ellipse cx="50" cy="50" rx="46" ry="28" fill="#A78BFA"/><ellipse cx="50" cy="50" rx="34" ry="20" fill="#C4B5FD"/><ellipse cx="50" cy="50" rx="20" ry="11" fill="#EDE9FE"/>',
+    boneka: '<circle cx="34" cy="16" r="8" fill="#B45309"/><circle cx="66" cy="16" r="8" fill="#B45309"/><ellipse cx="50" cy="74" rx="26" ry="22" fill="#B45309"/><ellipse cx="50" cy="78" rx="15" ry="14" fill="#FCD34D"/><circle cx="50" cy="34" r="22" fill="#B45309"/><ellipse cx="50" cy="42" rx="11" ry="8" fill="#FCD34D"/><circle cx="42" cy="30" r="3" fill="#1E293B"/><circle cx="58" cy="30" r="3" fill="#1E293B"/><ellipse cx="50" cy="39" rx="3.5" ry="2.5" fill="#1E293B"/>',
+    nakas: '<rect x="14" y="22" width="72" height="10" rx="4" fill="#A16207"/><rect x="20" y="32" width="60" height="54" fill="#D97706"/><rect x="26" y="38" width="48" height="19" rx="3" fill="#F59E0B"/><rect x="26" y="61" width="48" height="19" rx="3" fill="#F59E0B"/><circle cx="50" cy="47" r="3" fill="#78350F"/><circle cx="50" cy="70" r="3" fill="#78350F"/><rect x="22" y="86" width="9" height="7" fill="#78350F"/><rect x="69" y="86" width="9" height="7" fill="#78350F"/>',
+    jam: '<circle cx="30" cy="22" r="10" fill="#F87171"/><circle cx="70" cy="22" r="10" fill="#F87171"/><circle cx="50" cy="56" r="32" fill="#FACC15" stroke="#F59E0B" stroke-width="4"/><circle cx="50" cy="56" r="24" fill="#fff"/><path d="M50 56 V38 M50 56 L62 63" stroke="#334155" stroke-width="4" stroke-linecap="round"/><rect x="30" y="86" width="8" height="8" rx="2" fill="#F59E0B"/><rect x="62" y="86" width="8" height="8" rx="2" fill="#F59E0B"/>',
+    tas: '<path d="M34 30 Q50 4 66 30" stroke="#1D4ED8" stroke-width="6" fill="none"/><rect x="22" y="28" width="56" height="62" rx="16" fill="#3B82F6"/><rect x="31" y="56" width="38" height="26" rx="8" fill="#60A5FA"/><rect x="38" y="63" width="24" height="4" rx="2" fill="#fff"/><rect x="32" y="38" width="36" height="8" rx="4" fill="#93C5FD"/>',
+    sandal: '<ellipse cx="32" cy="60" rx="15" ry="29" fill="#34D399" transform="rotate(-8 32 60)"/><ellipse cx="68" cy="60" rx="15" ry="29" fill="#34D399" transform="rotate(8 68 60)"/><path d="M20 52 Q32 38 44 52" stroke="#059669" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M56 52 Q68 38 80 52" stroke="#059669" stroke-width="7" fill="none" stroke-linecap="round"/>',
+    bingkai: '<rect x="12" y="14" width="76" height="72" rx="6" fill="#92400E"/><rect x="22" y="24" width="56" height="52" fill="#BAE6FD"/><path d="M22 76 L42 48 L56 64 L66 54 L78 76Z" fill="#4ADE80"/><circle cx="64" cy="38" r="7" fill="#FDE047"/>',
+    keset: '<rect x="8" y="28" width="84" height="44" rx="10" fill="#F472B6"/><rect x="16" y="36" width="68" height="28" rx="6" fill="#FBCFE8"/><path d="M24 50h52" stroke="#F472B6" stroke-width="4" stroke-dasharray="6 6"/>',
+    gayung: '<rect x="62" y="36" width="34" height="8" rx="4" fill="#0EA5E9" transform="rotate(-25 62 40)"/><ellipse cx="40" cy="62" rx="26" ry="22" fill="#38BDF8"/><ellipse cx="40" cy="50" rx="26" ry="8" fill="#7DD3FC"/><ellipse cx="40" cy="50" rx="20" ry="5" fill="#0369A1" opacity=".35"/>',
+    susu: '<path d="M30 30 L50 14 L70 30 Z" fill="#E0F2FE" stroke="#60A5FA" stroke-width="3" stroke-linejoin="round"/><rect x="30" y="30" width="40" height="58" fill="#fff" stroke="#60A5FA" stroke-width="3"/><rect x="31.500" y="46" width="37" height="24" fill="#60A5FA"/><text x="50" y="63" text-anchor="middle" font-size="13" font-weight="700" fill="#fff" font-family="Arial,sans-serif">SUSU</text>',
+    piring: '<ellipse cx="50" cy="56" rx="44" ry="15" fill="#fff" stroke="#CBD5E1" stroke-width="3"/><ellipse cx="50" cy="54" rx="28" ry="9" fill="#F1F5F9"/><circle cx="46" cy="52" r="6" fill="#FB923C"/><circle cx="56" cy="54" r="5" fill="#22C55E"/>',
+    mangkuk: '<circle cx="36" cy="38" r="12" fill="#EF4444"/><circle cx="56" cy="34" r="12" fill="#FACC15"/><circle cx="70" cy="40" r="10" fill="#22C55E"/><path d="M12 46 H88 Q84 82 50 82 Q16 82 12 46Z" fill="#F472B6"/><rect x="12" y="44" width="76" height="6" rx="3" fill="#DB2777"/>'
+  };
+  var NAMES = { bantal: 'Bantal Sofa', bola: 'Bola Mainan', pot: 'Pot Tanaman', karpet: 'Karpet Bundar', boneka: 'Boneka Beruang', nakas: 'Meja Nakas', jam: 'Jam Weker', tas: 'Tas Sekolah', sandal: 'Sandal Rumah', bingkai: 'Bingkai Lukisan', keset: 'Keset Kaki', gayung: 'Gayung Mandi', susu: 'Kotak Susu', piring: 'Piring Makan', mangkuk: 'Mangkuk Buah' };
+
+  function itemSvg(id, size) {
+    return '<svg viewBox="0 0 100 100" width="' + size + '" height="' + size + '" aria-hidden="true">' + ART[id] + '</svg>';
+  }
+  function P(x, y, s, sy) { return { x: x, y: y, sx: s, sy: sy || s }; }
+  function placedG(id, p, anim) {
+    return '<g transform="translate(' + p.x + ' ' + p.y + ')"><g class="' + (anim ? 'pop' : '') + '"><g transform="scale(' + p.sx + ' ' + p.sy + ') translate(-50 -50)">' + ART[id] + '</g></g></g>';
+  }
+
+  /* ==================== RUANGAN (viewBox 960x600) ==================== */
+  function wf(wall, floor) {
+    return '<rect width="960" height="600" fill="' + wall + '"/>' +
+      '<rect y="380" width="960" height="220" fill="' + floor + '"/>' +
+      '<rect y="372" width="960" height="12" fill="rgba(0,0,0,.09)"/>' +
+      '<g stroke="rgba(0,0,0,.05)" stroke-width="2"><line x1="0" y1="450" x2="960" y2="450"/><line x1="0" y1="530" x2="960" y2="530"/></g>';
+  }
+
+  function roomTamu() {
+    return wf('#FDE7C8', '#E9C79B') +
+      '<g><rect x="660" y="70" width="230" height="170" rx="12" fill="#BAE6FD" stroke="#fff" stroke-width="10"/>' +
+      '<g class="cloud"><ellipse cx="730" cy="120" rx="34" ry="14" fill="#fff"/><ellipse cx="755" cy="112" rx="22" ry="12" fill="#fff"/></g>' +
+      '<line x1="775" y1="70" x2="775" y2="240" stroke="#fff" stroke-width="8"/><line x1="660" y1="155" x2="890" y2="155" stroke="#fff" stroke-width="8"/>' +
+      '<rect x="638" y="58" width="30" height="195" rx="10" fill="#FCA5A5"/><rect x="882" y="58" width="30" height="195" rx="10" fill="#FCA5A5"/></g>' +
+      '<g><rect x="260" y="70" width="150" height="100" rx="8" fill="#fff" stroke="#C084FC" stroke-width="8"/><path d="M270 160 L320 105 L350 135 L375 112 L400 160Z" fill="#86EFAC"/><circle cx="375" cy="95" r="12" fill="#FDE047" class="glow"/></g>' +
+      /* sofa */
+      '<rect x="90" y="215" width="340" height="140" rx="30" fill="#60A5FA"/>' +
+      '<rect x="70" y="320" width="380" height="85" rx="22" fill="#3B82F6"/>' +
+      '<rect x="48" y="265" width="55" height="145" rx="24" fill="#2563EB"/>' +
+      '<rect x="417" y="265" width="55" height="145" rx="24" fill="#2563EB"/>' +
+      '<rect x="75" y="405" width="14" height="18" fill="#7C4A21"/><rect x="431" y="405" width="14" height="18" fill="#7C4A21"/>' +
+      placedG('bantal2', P(380, 315, 1), false) +
+      /* meja tamu */
+      '<ellipse cx="775" cy="562" rx="120" ry="12" fill="rgba(0,0,0,.1)"/>' +
+      '<rect x="665" y="449" width="18" height="108" rx="4" fill="#854D0E"/><rect x="867" y="449" width="18" height="108" rx="4" fill="#854D0E"/>' +
+      '<rect x="650" y="425" width="250" height="26" rx="10" fill="#A16207"/><rect x="650" y="425" width="250" height="8" rx="4" fill="#CA8A04"/>';
+  }
+
+  function roomTidur() {
+    return wf('#EDE9FE', '#D9B98A') +
+      '<g><rect x="420" y="50" width="200" height="140" rx="12" fill="#BAE6FD" stroke="#fff" stroke-width="10"/>' +
+      '<g class="cloud"><ellipse cx="480" cy="95" rx="30" ry="12" fill="#fff"/></g>' +
+      '<circle cx="570" cy="90" r="16" fill="#FDE047" class="glow"/>' +
+      '<line x1="520" y1="50" x2="520" y2="190" stroke="#fff" stroke-width="7"/>' +
+      '<rect x="398" y="40" width="28" height="160" rx="10" fill="#F9A8D4"/><rect x="614" y="40" width="28" height="160" rx="10" fill="#F9A8D4"/></g>' +
+      '<g fill="#FDE047" opacity=".8"><polygon points="90,70 96,84 111,85 100,95 103,110 90,102 77,110 80,95 69,85 84,84"/><polygon points="190,120 194,130 205,131 197,138 199,148 190,142 181,148 183,138 175,131 186,130"/></g>' +
+      /* tempat tidur */
+      '<ellipse cx="320" cy="430" rx="200" ry="26" fill="rgba(0,0,0,.12)"/>' +
+      '<rect x="120" y="205" width="400" height="110" rx="24" fill="#92400E"/>' +
+      '<rect x="120" y="393" width="18" height="58" rx="4" fill="#78350F"/><rect x="502" y="393" width="18" height="58" rx="4" fill="#78350F"/>' +
+      '<rect x="105" y="300" width="430" height="95" rx="18" fill="#F9A8D4"/>' +
+      '<rect x="105" y="336" width="430" height="59" rx="14" fill="#FB7185"/>' +
+      '<rect x="140" y="278" width="110" height="46" rx="20" fill="#fff" stroke="#E2E8F0" stroke-width="3"/>' +
+      /* lemari pakaian (terbuka) */
+      '<rect x="745" y="180" width="180" height="275" rx="10" fill="#B45309"/>' +
+      '<rect x="760" y="195" width="150" height="245" rx="6" fill="#FEF3C7"/>' +
+      '<line x1="765" y1="228" x2="905" y2="228" stroke="#78350F" stroke-width="5"/>' +
+      '<rect x="780" y="230" width="22" height="64" rx="6" fill="#F87171"/><rect x="812" y="230" width="22" height="58" rx="6" fill="#60A5FA"/><rect x="844" y="230" width="22" height="68" rx="6" fill="#34D399"/><rect x="876" y="230" width="22" height="56" rx="6" fill="#FBBF24"/>' +
+      '<polygon points="745,180 766,196 766,438 745,455" fill="#92400E"/>' +
+      '<rect x="760" y="440" width="150" height="8" fill="#D97706"/>';
+  }
+
+  function roomMandi() {
+    return '<defs><pattern id="tiles" width="60" height="60" patternUnits="userSpaceOnUse"><rect width="60" height="60" fill="#CFFAFE"/><path d="M0 0H60V60H0Z" fill="none" stroke="#fff" stroke-width="3"/></pattern></defs>' +
+      '<rect width="960" height="380" fill="url(#tiles)"/>' + wf('none', '#C7D2FE').replace('<rect width="960" height="600" fill="none"/>', '') +
+      /* cermin & wastafel */
+      '<rect x="430" y="80" width="130" height="140" rx="30" fill="#E0F2FE" stroke="#fff" stroke-width="8"/><path d="M450 190 L520 100" stroke="#fff" stroke-width="6" opacity=".7"/>' +
+      '<rect x="425" y="300" width="140" height="20" rx="10" fill="#fff" stroke="#CBD5E1" stroke-width="3"/><rect x="480" y="320" width="30" height="62" fill="#E2E8F0"/>' +
+      '<rect x="488" y="270" width="14" height="34" rx="5" fill="#94A3B8"/><rect x="488" y="268" width="36" height="10" rx="5" fill="#94A3B8"/>' +
+      /* shower */
+      '<line x1="850" y1="0" x2="850" y2="110" stroke="#94A3B8" stroke-width="8"/><ellipse cx="850" cy="120" rx="38" ry="14" fill="#94A3B8"/>' +
+      '<g class="glow" fill="#38BDF8"><circle cx="830" cy="150" r="4"/><circle cx="850" cy="165" r="4"/><circle cx="870" cy="150" r="4"/><circle cx="840" cy="190" r="4"/><circle cx="862" cy="200" r="4"/></g>' +
+      /* kloset */
+      '<rect x="190" y="190" width="110" height="95" rx="14" fill="#fff" stroke="#CBD5E1" stroke-width="3"/><circle cx="245" cy="212" r="9" fill="#38BDF8"/>' +
+      '<rect x="150" y="284" width="190" height="42" rx="21" fill="#fff" stroke="#CBD5E1" stroke-width="3"/>' +
+      '<rect x="185" y="324" width="120" height="72" rx="20" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="3"/>' +
+      /* ember */
+      '<ellipse cx="700" cy="456" rx="70" ry="10" fill="rgba(0,0,0,.12)"/>' +
+      '<path d="M648 298 Q700 210 752 298" stroke="#9A3412" stroke-width="6" fill="none"/>' +
+      '<polygon points="640,300 760,300 746,452 654,452" fill="#FB923C"/>' +
+      '<rect x="652" y="360" width="96" height="10" fill="#EA580C" opacity=".6"/>' +
+      '<ellipse cx="700" cy="300" rx="60" ry="13" fill="#FDBA74"/><ellipse cx="700" cy="303" rx="52" ry="9" fill="#38BDF8"/>';
+  }
+
+  function roomDapur() {
+    return wf('#FEF3C7', '#E7C9A0') +
+      '<rect x="0" y="260" width="960" height="112" fill="#FDE68A" opacity=".55"/>' +
+      '<g><rect x="330" y="60" width="220" height="140" rx="12" fill="#BAE6FD" stroke="#fff" stroke-width="10"/><g class="cloud"><ellipse cx="400" cy="105" rx="30" ry="12" fill="#fff"/></g><line x1="440" y1="60" x2="440" y2="200" stroke="#fff" stroke-width="7"/></g>' +
+      /* lampu gantung */
+      '<line x1="775" y1="0" x2="775" y2="230" stroke="#64748B" stroke-width="4"/><polygon points="735,270 815,270 795,230 755,230" fill="#F59E0B"/><circle cx="775" cy="272" r="9" fill="#FDE047" class="glow"/>' +
+      /* kulkas (terbuka) */
+      '<rect x="60" y="110" width="170" height="360" rx="14" fill="#E2E8F0" stroke="#94A3B8" stroke-width="4"/>' +
+      '<rect x="75" y="125" width="140" height="330" rx="8" fill="#F0F9FF"/>' +
+      '<rect x="75" y="210" width="140" height="6" fill="#94A3B8"/><rect x="75" y="300" width="140" height="6" fill="#94A3B8"/><rect x="75" y="385" width="140" height="6" fill="#94A3B8"/>' +
+      '<circle cx="95" cy="200" r="9" fill="#EF4444"/><circle cx="118" cy="202" r="8" fill="#F97316"/><ellipse cx="180" cy="378" rx="14" ry="10" fill="#FDE68A"/><rect x="95" y="345" width="30" height="40" rx="6" fill="#86EFAC"/><circle cx="170" cy="290" r="9" fill="#EF4444"/>' +
+      '<polygon points="60,110 40,126 40,456 60,470" fill="#CBD5E1"/>' +
+      /* meja dapur: kompor & wastafel */
+      '<rect x="270" y="353" width="335" height="122" rx="6" fill="#C4B5FD"/><line x1="440" y1="360" x2="440" y2="470" stroke="#A78BFA" stroke-width="3"/><rect x="262" y="334" width="351" height="20" rx="6" fill="#E5E7EB"/>' +
+      '<rect x="285" y="318" width="110" height="16" rx="5" fill="#475569"/><ellipse cx="320" cy="318" rx="20" ry="5" fill="#EF4444" class="glow"/><ellipse cx="362" cy="318" rx="14" ry="4" fill="#F97316" class="glow"/>' +
+      '<rect x="302" y="280" width="68" height="38" rx="8" fill="#94A3B8"/><rect x="296" y="276" width="80" height="8" rx="4" fill="#64748B"/>' +
+      '<rect x="485" y="320" width="108" height="14" rx="6" fill="#94A3B8"/><rect x="535" y="280" width="10" height="42" rx="5" fill="#64748B"/><rect x="520" y="276" width="42" height="9" rx="4" fill="#64748B"/>' +
+      /* meja makan */
+      '<ellipse cx="775" cy="560" rx="125" ry="12" fill="rgba(0,0,0,.1)"/>' +
+      '<rect x="660" y="427" width="18" height="130" rx="4" fill="#854D0E"/><rect x="872" y="427" width="18" height="130" rx="4" fill="#854D0E"/>' +
+      '<rect x="640" y="405" width="270" height="24" rx="10" fill="#B45309"/><rect x="640" y="405" width="270" height="8" rx="4" fill="#D97706"/>';
+  }
+
+  var ROOMS = {
+    tamu: { name: 'Ruang Tamu', draw: roomTamu },
+    tidur: { name: 'Kamar Tidur', draw: roomTidur },
+    mandi: { name: 'Kamar Mandi', draw: roomMandi },
+    dapur: { name: 'Dapur', draw: roomDapur }
+  };
+
+  /* ==================== BANK SOAL (15 soal) ==================== */
+  var Q = [
+    { room: 'tamu', item: 'bantal', text: 'Letakkan bantal sofa di atas sofa santai.', kunci: 'di atas', zone: [50, 200, 470, 415], at: P(150, 315, 1), why: 'di bagian atas sofa, yaitu di permukaan dudukan sofa, bukan di lantai.' },
+    { room: 'tamu', item: 'bola', text: 'Pindahkan bola mainan ke bawah meja tamu.', kunci: 'bawah', zone: [640, 452, 905, 590], at: P(775, 515, 0.6), why: 'di lantai bagian bawah, tepat di kolong meja tamu.' },
+    { room: 'tamu', item: 'pot', text: 'Letakkan pot tanaman hias di sebelah kanan sofa.', kunci: 'di sebelah kanan', zone: [475, 230, 640, 425], at: P(545, 335, 1.5), why: 'di sisi kanan sofa, bersebelahan dengan sofa (sisi tangan kanan).' },
+    { room: 'tamu', item: 'karpet', text: 'Hamparkan karpet bundar di depan sofa.', kunci: 'di depan', zone: [30, 415, 490, 598], at: P(260, 500, 3.6, 1.5), why: 'di lantai bagian depan sofa, yaitu di sisi yang lebih dekat denganmu.' },
+    { room: 'tamu', item: 'boneka', text: 'Letakkan boneka beruang di antara dua bantal sofa.', kunci: 'di antara', zone: [185, 250, 345, 412], at: P(265, 318, 0.9), why: 'di tengah-tengah sofa, diapit oleh dua bantal di kiri dan kanannya.' },
+    { room: 'tidur', item: 'nakas', text: 'Letakkan meja nakas kecil di samping (sebelah kanan) tempat tidur.', kunci: 'di samping (sebelah kanan)', zone: [530, 290, 725, 480], at: P(622, 402, 1.4), why: 'di sisi kanan tempat tidur, tepat bersebelahan dengan kasur.' },
+    { room: 'tidur', item: 'jam', text: 'Letakkan jam weker di atas meja nakas.', kunci: 'di atas', zone: [545, 255, 700, 375], at: P(622, 332, 0.7), why: 'di permukaan atas meja nakas, bukan di lantai atau di dalam laci.' },
+    { room: 'tidur', item: 'tas', text: 'Rapikan tas sekolah ke dalam lemari pakaian.', kunci: 'ke dalam', zone: [745, 185, 925, 462], at: P(835, 392, 0.9), why: 'di bagian dalam lemari pakaian, bukan di luar lemari.' },
+    { room: 'tidur', item: 'sandal', text: 'Letakkan sandal rumah di bawah tempat tidur.', kunci: 'di bawah', zone: [125, 392, 515, 495], at: P(320, 428, 0.8), why: 'di bagian bawah tempat tidur, yaitu di kolong tempat tidur.' },
+    { room: 'tidur', item: 'bingkai', text: 'Pasang bingkai lukisan di sebelah kiri jendela kamar.', kunci: 'di sebelah kiri', zone: [255, 40, 415, 205], at: P(335, 125, 0.8), why: 'di dinding sebelah kiri jendela (sisi tangan kiri jendela).' },
+    { room: 'mandi', item: 'keset', text: 'Letakkan keset kaki di depan kloset.', kunci: 'di depan', zone: [90, 405, 395, 598], at: P(240, 500, 2.6, 1.5), why: 'di lantai bagian depan kloset, tempat kita berdiri menghadap kloset.' },
+    { room: 'mandi', item: 'gayung', text: 'Masukkan gayung mandi ke dalam ember air.', kunci: 'ke dalam', zone: [600, 255, 800, 475], at: P(700, 300, 0.9), why: 'di dalam ember air, bukan di luar ember.' },
+    { room: 'dapur', item: 'susu', text: 'Simpan kotak susu ke dalam kulkas.', kunci: 'ke dalam', zone: [45, 110, 245, 480], at: P(145, 258, 1.1), why: 'di bagian dalam kulkas, di atas rak kulkas.' },
+    { room: 'dapur', item: 'piring', text: 'Letakkan piring makan di atas meja makan.', kunci: 'di atas', zone: [630, 325, 925, 430], at: P(775, 388, 1), why: 'di permukaan atas meja makan, bukan di lantai.' },
+    { room: 'dapur', item: 'mangkuk', text: 'Letakkan mangkuk buah di antara kompor dan wastafel.', kunci: 'di antara', zone: [380, 225, 495, 405], at: P(437, 305, 1), why: 'di tengah-tengah, di antara kompor (kiri) dan wastafel (kanan).' }
+  ];
+
+  /* ==================== MATERI ==================== */
+  var G = '<rect x="5" y="76" width="110" height="6" rx="3" fill="#E5E7EB"/>';
+  var MATERI = [
+    { t: 'Di Atas', d: 'Benda berada di permukaan atas benda lain.', e: 'Bantal di atas sofa.',
+      s: G + '<rect x="25" y="46" width="70" height="30" rx="8" fill="#60A5FA"/><ellipse cx="60" cy="38" rx="18" ry="10" fill="#FDA4AF"/><path d="M60 8 V22 M54 16 L60 24 L66 16" stroke="#7C3AED" stroke-width="3" fill="none" stroke-linecap="round"/>' },
+    { t: 'Di Bawah', d: 'Benda berada di tempat yang lebih rendah atau di kolong.', e: 'Bola di bawah meja.',
+      s: G + '<rect x="20" y="30" width="80" height="8" rx="3" fill="#A16207"/><rect x="26" y="38" width="6" height="38" fill="#854D0E"/><rect x="88" y="38" width="6" height="38" fill="#854D0E"/><circle cx="60" cy="66" r="9" fill="#EF4444"/><path d="M60 44 V54 M55 49 L60 55 L65 49" stroke="#7C3AED" stroke-width="3" fill="none" stroke-linecap="round"/>' },
+    { t: 'Di Sebelah Kanan', d: 'Benda berada di sisi tangan kananmu.', e: 'Pot tanaman di sebelah kanan sofa.',
+      s: G + '<rect x="12" y="46" width="56" height="30" rx="8" fill="#60A5FA"/><rect x="88" y="58" width="16" height="18" fill="#EA580C"/><ellipse cx="96" cy="50" rx="8" ry="12" fill="#22C55E"/><path d="M72 40 H84 M79 35 L85 40 L79 45" stroke="#7C3AED" stroke-width="3" fill="none" stroke-linecap="round"/><text x="60" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="#64748B">kanan</text>' },
+    { t: 'Di Sebelah Kiri', d: 'Benda berada di sisi tangan kirimu.', e: 'Jam di sebelah kiri tempat tidur.',
+      s: G + '<rect x="52" y="46" width="56" height="30" rx="8" fill="#F9A8D4"/><circle cx="22" cy="62" r="11" fill="#FACC15" stroke="#F59E0B" stroke-width="3"/><path d="M22 62 V55 M22 62 L27 65" stroke="#334155" stroke-width="2" stroke-linecap="round"/><path d="M48 40 H36 M41 35 L35 40 L41 45" stroke="#7C3AED" stroke-width="3" fill="none" stroke-linecap="round"/><text x="60" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="#64748B">kiri</text>' },
+    { t: 'Di Depan', d: 'Benda berada di muka benda lain.', e: 'Karpet di depan sofa.',
+      s: G + '<rect x="25" y="20" width="70" height="34" rx="8" fill="#60A5FA"/><ellipse cx="60" cy="66" rx="36" ry="10" fill="#A78BFA"/><text x="60" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#64748B">belakang</text><text x="60" y="87" text-anchor="middle" font-size="11" font-weight="700" fill="#7C3AED">depan</text>' },
+    { t: 'Di Belakang', d: 'Benda berada di punggung atau di balik benda lain.', e: 'Bola di belakang kotak.',
+      s: G + '<circle cx="74" cy="50" r="15" fill="#EF4444"/><rect x="36" y="40" width="42" height="36" rx="6" fill="#FBBF24" stroke="#F59E0B" stroke-width="3"/><text x="57" y="62" text-anchor="middle" font-size="11" font-weight="700" fill="#92400E">kotak</text>' },
+    { t: 'Di Dalam', d: 'Benda berada di bagian dalam wadah atau lemari.', e: 'Susu di dalam kulkas.',
+      s: G + '<rect x="35" y="8" width="50" height="68" rx="6" fill="#E2E8F0" stroke="#94A3B8" stroke-width="3"/><rect x="41" y="14" width="38" height="56" rx="3" fill="#F0F9FF"/><rect x="52" y="38" width="16" height="26" fill="#fff" stroke="#60A5FA" stroke-width="2"/><rect x="52" y="46" width="16" height="9" fill="#60A5FA"/>' },
+    { t: 'Di Luar', d: 'Benda berada di luar wadah atau bilik.', e: 'Sandal di luar kamar.',
+      s: G + '<rect x="12" y="22" width="54" height="54" rx="6" fill="#FEF3C7" stroke="#F59E0B" stroke-width="3"/><text x="39" y="54" text-anchor="middle" font-size="11" font-weight="700" fill="#92400E">kamar</text><ellipse cx="94" cy="68" rx="9" ry="6" fill="#34D399"/><ellipse cx="106" cy="68" rx="9" ry="6" fill="#34D399"/><path d="M80 52 H70 M75 47 L69 52 L75 57" stroke="#7C3AED" stroke-width="3" fill="none" stroke-linecap="round" transform="translate(0 -2)"/>' },
+    { t: 'Di Antara', d: 'Benda berada di tengah-tengah, diapit oleh dua benda.', e: 'Boneka di antara dua bantal.',
+      s: G + '<ellipse cx="24" cy="62" rx="15" ry="12" fill="#FDA4AF"/><circle cx="53" cy="36" r="6" fill="#B45309" opacity="0"/><circle cx="60" cy="52" r="14" fill="#B45309"/><circle cx="52" cy="40" r="5" fill="#B45309"/><circle cx="68" cy="40" r="5" fill="#B45309"/><circle cx="56" cy="50" r="2" fill="#1E293B"/><circle cx="64" cy="50" r="2" fill="#1E293B"/><ellipse cx="60" cy="68" rx="14" ry="8" fill="#B45309"/><ellipse cx="96" cy="62" rx="15" ry="12" fill="#FDA4AF"/>' },
+    { t: 'Di Samping', d: 'Benda berada tepat di sisi kanan atau kiri benda lain.', e: 'Meja nakas di samping tempat tidur.',
+      s: G + '<rect x="8" y="44" width="62" height="32" rx="8" fill="#F9A8D4"/><rect x="78" y="48" width="30" height="28" rx="3" fill="#D97706"/><rect x="78" y="48" width="30" height="7" fill="#A16207"/><path d="M71 30 H77 M67 30 L72 25 M67 30 L72 35 M81 30 L76 25 M81 30 L76 35" stroke="#7C3AED" stroke-width="2.500" fill="none" stroke-linecap="round"/>' }
+  ];
+
+  /* ==================== AUDIO ==================== */
+  var AC = null, muted = false;
+  function actx() {
+    if (muted) return null;
+    if (!AC) {
+      var C = window.AudioContext || window.webkitAudioContext;
+      if (!C) return null;
+      try { AC = new C(); } catch (e) { return null; }
+    }
+    if (AC.state === 'suspended' && AC.resume) { try { AC.resume(); } catch (e) {} }
+    return AC;
+  }
+  function tone(f, t0, d, type, vol, f2) {
+    var c = actx(); if (!c) return;
+    var now = c.currentTime + t0, o = c.createOscillator(), g = c.createGain();
+    o.type = type || 'sine';
+    o.frequency.setValueAtTime(f, now);
+    if (f2) o.frequency.linearRampToValueAtTime(f2, now + d);
+    g.gain.setValueAtTime(0.0001, now);
+    g.gain.exponentialRampToValueAtTime(vol || 0.2, now + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + d);
+    o.connect(g); g.connect(c.destination);
+    o.start(now); o.stop(now + d + 0.05);
+  }
+  function clap(t0) {
+    var c = actx(); if (!c) return;
+    var len = Math.floor(c.sampleRate * 0.12), buf = c.createBuffer(1, len, c.sampleRate), data = buf.getChannelData(0), i;
+    for (i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+    var src = c.createBufferSource(), g = c.createGain(), f = c.createBiquadFilter();
+    f.type = 'bandpass'; f.frequency.value = 1800;
+    src.buffer = buf; g.gain.value = 0.35;
+    src.connect(f); f.connect(g); g.connect(c.destination);
+    src.start(c.currentTime + t0);
+  }
+  function sfxOk() { tone(523.25, 0, 0.15, 'sine', 0.25); tone(659.25, 0.15, 0.15, 'sine', 0.25); tone(783.99, 0.30, 0.25, 'sine', 0.25); }
+  function sfxBad() { tone(180, 0, 0.25, 'triangle', 0.28, 130); tone(180, 0.28, 0.3, 'triangle', 0.28, 130); }
+  function sfxWin() {
+    tone(523.25, 0, 0.2, 'square', 0.12); tone(659.25, 0.2, 0.2, 'square', 0.12);
+    tone(783.99, 0.4, 0.2, 'square', 0.12); tone(1046.5, 0.6, 0.5, 'square', 0.14);
+    var k; for (k = 0; k < 7; k++) clap(1.1 + k * 0.14);
+  }
+
+  /* ==================== KONFETI ==================== */
+  var cv = $('confetti'), cctx = cv.getContext('2d'), parts = [], running = false;
+  var COLORS = ['#F87171', '#FBBF24', '#34D399', '#60A5FA', '#A78BFA', '#F472B6', '#FB923C'];
+  function sizeCv() { cv.width = window.innerWidth; cv.height = window.innerHeight; }
+  sizeCv(); window.addEventListener('resize', sizeCv);
+  function burst(n, x, y) {
+    var i;
+    for (i = 0; i < n; i++) {
+      var a = Math.random() * Math.PI * 2, sp = 4 + Math.random() * 9;
+      parts.push({ x: x, y: y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 6, w: 6 + Math.random() * 8, h: 4 + Math.random() * 6, r: Math.random() * 6, vr: (Math.random() - 0.5) * 0.4, c: COLORS[(Math.random() * COLORS.length) | 0], life: 90 + Math.random() * 60 });
+    }
+    if (!running) { running = true; requestAnimationFrame(loop); }
+  }
+  function loop() {
+    cctx.clearRect(0, 0, cv.width, cv.height);
+    var i, p;
+    for (i = parts.length - 1; i >= 0; i--) {
+      p = parts[i];
+      p.vy += 0.28; p.vx *= 0.99; p.x += p.vx; p.y += p.vy; p.r += p.vr; p.life--;
+      if (p.life <= 0 || p.y > cv.height + 30) { parts.splice(i, 1); continue; }
+      cctx.save(); cctx.translate(p.x, p.y); cctx.rotate(p.r);
+      cctx.globalAlpha = Math.min(1, p.life / 30);
+      cctx.fillStyle = p.c; cctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      cctx.restore();
+    }
+    if (parts.length) requestAnimationFrame(loop); else { running = false; cctx.clearRect(0, 0, cv.width, cv.height); }
+  }
+
+  /* ==================== PENYIMPANAN & PAPAN PERINGKAT ==================== */
+  var memLB = [];
+  function loadLB() {
+    try {
+      var r = localStorage.getItem(KEY), a = r ? JSON.parse(r) : [];
+      return Array.isArray(a) ? a : [];
+    } catch (e) { return memLB; }
+  }
+  function saveLB(a) {
+    memLB = a;
+    try { localStorage.setItem(KEY, JSON.stringify(a)); } catch (e) {}
+  }
+  function better(a, b) { return a.score > b.score || (a.score === b.score && a.time < b.time); }
+  function addScore(name, score, time) {
+    var list = loadLB(), key = name.trim().toLowerCase(), entry = { name: name.trim(), score: score, time: time, ts: Date.now() }, i, found = false;
+    for (i = 0; i < list.length; i++) {
+      if (String(list[i].name).trim().toLowerCase() === key) {
+        found = true;
+        if (better(entry, list[i])) list[i] = entry;
+        break;
+      }
+    }
+    if (!found) list.push(entry);
+    saveLB(list);
+  }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function fmt(sec) { var m = Math.floor(sec / 60), s = sec % 60; return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s; }
+  function fmtDate(ts) {
+    try { return new Date(ts).toLocaleString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    catch (e) { return new Date(ts).toString(); }
+  }
+  function renderLB() {
+    var list = loadLB().slice().sort(function (a, b) {
+      if (b.score !== a.score) return b.score - a.score;
+      if (a.time !== b.time) return a.time - b.time;
+      return a.ts - b.ts;
+    });
+    var box = $('lbBody');
+    if (!list.length) {
+      box.innerHTML = '<div class="lbwrap"><div class="empty">Belum ada data. Selesaikan permainan untuk menjadi yang pertama di papan peringkat! 🌟</div></div>';
+      return;
+    }
+    var h = '<div class="lbwrap"><table class="lb"><thead><tr><th>Peringkat (#)</th><th>Nama Murid</th><th>Skor</th><th>Waktu Pengerjaan</th><th>Tanggal &amp; Jam</th></tr></thead><tbody>', i;
+    for (i = 0; i < list.length; i++) {
+      var e = list[i], r = i + 1;
+      h += '<tr class="' + (r <= 3 ? 'r' + r : '') + '"><td>' + (r <= 3 ? '<span class="medal m' + r + '">' + r + '</span>' : '<b>' + r + '</b>') + '</td><td>' + esc(e.name) + '</td><td><b>' + e.score + '</b></td><td>' + fmt(e.time) + '</td><td>' + esc(fmtDate(e.ts)) + '</td></tr>';
+    }
+    box.innerHTML = h + '</tbody></table></div>';
+  }
+
+  /* ==================== MODAL ==================== */
+  function openModal(id) { $(id).classList.remove('hidden'); }
+  function closeModal(id) { $(id).classList.add('hidden'); }
+  function buildMateri() {
+    var h = '', i;
+    for (i = 0; i < MATERI.length; i++) {
+      var m = MATERI[i];
+      h += '<div class="pc"><span class="no">' + (i + 1) + '</span><h3>' + m.t + '</h3><svg viewBox="0 0 120 90" aria-hidden="true">' + m.s + '</svg><p>' + m.d + '</p><p class="ex">Contoh: ' + m.e + '</p></div>';
+    }
+    $('cardsMateri').innerHTML = h;
+  }
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest ? e.target.closest('[data-close]') : null;
+    if (t) closeModal(t.getAttribute('data-close'));
+    if (e.target.classList && e.target.classList.contains('modal')) e.target.classList.add('hidden');
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { closeModal('modalMateri'); closeModal('modalLB'); }
+  });
+
+  /* ==================== STATE GAME ==================== */
+  var idx = 0, score = 0, nOk = 0, nBad = 0, startT = 0, tInt = null, nextT = null, locked = true, selected = false, studentName = '', lastDrag = 0, drag = null;
+
+  function show(which) {
+    ['screenStart', 'screenGame', 'screenEnd'].forEach(function (s) { $(s).classList.add('hidden'); });
+    $(which).classList.remove('hidden');
+    window.scrollTo(0, 0);
+  }
+  function tick() { $('sTime').textContent = fmt(Math.floor((Date.now() - startT) / 1000)); }
+
+  function startGame() {
+    studentName = $('inName').value.trim();
+    if (!studentName) return;
+    actx();
+    idx = 0; score = 0; nOk = 0; nBad = 0;
+    $('sName').textContent = studentName;
+    $('sTot').textContent = Q.length;
+    show('screenGame');
+    startT = Date.now(); tick();
+    clearInterval(tInt); tInt = setInterval(tick, 500);
+    loadQ();
+  }
+
+  function renderRoom(withToast) {
+    var q = Q[idx], s = ROOMS[q.room].draw(), i;
+    for (i = 0; i < idx; i++) if (Q[i].room === q.room) s += placedG(Q[i].item, Q[i].at, false);
+    s += '<g id="overlay"></g>';
+    $('room').innerHTML = s;
+  }
+
+  function loadQ() {
+    var q = Q[idx];
+    locked = false; selected = false;
+    clearTimeout(nextT);
+    $('sNo').textContent = idx + 1;
+    $('sScore').textContent = score;
+    $('sRoom').textContent = ROOMS[q.room].name;
+    $('prog').style.width = (idx / Q.length * 100) + '%';
+    var txt = esc(q.text), k = esc(q.kunci);
+    $('missionTxt').innerHTML = txt.replace(k, '<span class="kw">' + k + '</span>');
+    renderRoom();
+    $('room').classList.remove('sel');
+    $('fbslot').innerHTML = '';
+    $('hint').textContent = 'Geser bendanya ke ruangan, atau ketuk benda lalu ketuk tempat tujuan.';
+    $('trayItem').innerHTML = '<div class="titem" id="theItem" title="' + NAMES[q.item] + '">' + itemSvg(q.item, 96) + '<div class="nm">' + NAMES[q.item] + '</div></div>';
+    var oldToast = document.querySelector('.toast');
+    if (oldToast) oldToast.remove();
+    if (idx === 0 || Q[idx - 1].room !== q.room) {
+      var t = document.createElement('div');
+      t.className = 'toast'; t.textContent = 'Kamu masuk ke ' + ROOMS[q.room].name + '!';
+      document.querySelector('.stage').appendChild(t);
+      setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 2300);
+    }
+  }
+
+  function toSvg(cx, cy) {
+    var svg = $('room'), m = svg.getScreenCTM();
+    if (!m) return null;
+    var pt = svg.createSVGPoint(); pt.x = cx; pt.y = cy;
+    var p = pt.matrixTransform(m.inverse());
+    if (p.x < 0 || p.x > 960 || p.y < 0 || p.y > 600) return null;
+    return p;
+  }
+
+  function setSelected(v) {
+    selected = v;
+    var el = $('theItem');
+    if (el) el.classList.toggle('selected', v);
+    $('room').classList.toggle('sel', v);
+    $('hint').textContent = v ? 'Bagus! Sekarang ketuk tempat tujuannya di ruangan.' : 'Geser bendanya ke ruangan, atau ketuk benda lalu ketuk tempat tujuan.';
+  }
+
+  function answer(x, y) {
+    if (locked) return;
+    locked = true;
+    var q = Q[idx], z = q.zone;
+    var ok = x >= z[0] && x <= z[2] && y >= z[1] && y <= z[3];
+    setSelected(false);
+    $('hint').textContent = '';
+    var el = $('theItem'); if (el) el.classList.add('gone');
+    var ov = $('overlay');
+    if (!ok) {
+      ov.innerHTML = '<rect class="zonehint" x="' + z[0] + '" y="' + z[1] + '" width="' + (z[2] - z[0]) + '" height="' + (z[3] - z[1]) + '" rx="22" fill="rgba(16,185,129,.18)" stroke="#10B981" stroke-width="5" stroke-dasharray="14 8"/>';
+    }
+    ov.innerHTML += placedG(q.item, q.at, true);
+    var last = idx === Q.length - 1;
+    if (ok) {
+      score += 10; nOk++;
+      $('sScore').textContent = score;
+      sfxOk();
+      var r = $('room').getBoundingClientRect();
+      burst(130, r.left + r.width / 2, r.top + r.height / 3);
+      $('fbslot').innerHTML = '<div class="fb ok"><span class="badge">🎉 Hebat! Jawabanmu Benar! +10</span></div>';
+      nextT = setTimeout(advance, 1500);
+    } else {
+      nBad++;
+      sfxBad();
+      $('fbslot').innerHTML = '<div class="fb bad"><div class="msg">💡 Kurang tepat. Posisi yang tepat adalah ' + esc(q.why) + '</div><button class="btn amber small" id="btnNext">' + (last ? 'Lihat Hasil ▶' : 'Lanjut ke Soal Berikutnya ▶') + '</button><div class="bar"><i></i></div></div>';
+      $('btnNext').addEventListener('click', function () { clearTimeout(nextT); advance(); });
+      nextT = setTimeout(advance, 3500);
+    }
+    $('prog').style.width = ((idx + 1) / Q.length * 100) + '%';
+  }
+
+  function advance() {
+    clearTimeout(nextT);
+    if (idx >= Q.length - 1) { finish(); return; }
+    idx++;
+    loadQ();
+  }
+
+  function starSvg(on, delay) {
+    return '<svg viewBox="0 0 100 100" class="' + (on ? 'on' : '') + '" style="animation-delay:' + delay + 's"><polygon points="50,6 62,36 94,38 69,58 78,90 50,72 22,90 31,58 6,38 38,36" fill="' + (on ? '#FBBF24' : '#E2E8F0') + '" stroke="' + (on ? '#F59E0B' : '#CBD5E1') + '" stroke-width="5" stroke-linejoin="round"/></svg>';
+  }
+
+  function finish() {
+    clearInterval(tInt);
+    var total = Math.max(1, Math.round((Date.now() - startT) / 1000));
+    addScore(studentName, score, total);
+    var stars = nOk >= 13 ? 3 : (nOk >= 9 ? 2 : 1);
+    var acc = Math.round(nOk / Q.length * 100);
+    var msgs = {
+      3: 'Luar biasa, ' + esc(studentName) + '! Bu Ani Setyaningsih sangat bangga padamu. Kamu sudah paham sekali tentang posisi benda!',
+      2: 'Bagus sekali, ' + esc(studentName) + '! Bu Ani Setyaningsih senang melihat usahamu. Terus berlatih ya, sedikit lagi sempurna!',
+      1: 'Semangat, ' + esc(studentName) + '! Bu Ani Setyaningsih yakin kamu bisa lebih baik. Pelajari lagi materinya lalu coba main lagi ya!'
+    };
+    $('screenEnd').innerHTML =
+      '<h2>🎊 Selamat, ' + esc(studentName) + '! 🎊</h2>' +
+      '<div class="stars">' + starSvg(stars >= 1, 0.2) + starSvg(stars >= 2, 0.6) + starSvg(stars >= 3, 1.0) + '</div>' +
+      '<p class="msg">' + msgs[stars] + '</p>' +
+      '<div class="stats">' +
+      '<div class="stat" style="background:#FEF3C7"><b>' + score + '</b><span>Skor Akhir</span></div>' +
+      '<div class="stat" style="background:#D1FAE5"><b>' + nOk + ' / ' + nBad + '</b><span>Benar / Salah</span></div>' +
+      '<div class="stat" style="background:#EDE9FE"><b>' + acc + '%</b><span>Akurasi</span></div>' +
+      '<div class="stat" style="background:#FFE4E6"><b>' + fmt(total) + '</b><span>Total Waktu</span></div>' +
+      '</div>' +
+      '<div class="row"><button class="btn amber" id="btnEndLB">🏆 Lihat Papan Peringkat</button><button class="btn green" id="btnAgain">🔄 Main Lagi</button></div>';
+    $('btnEndLB').addEventListener('click', function () { renderLB(); openModal('modalLB'); });
+    $('btnAgain').addEventListener('click', function () { show('screenStart'); $('inName').value = studentName; $('btnStart').disabled = !studentName; });
+    show('screenEnd');
+    sfxWin();
+    setTimeout(function () { burst(180, window.innerWidth * 0.3, window.innerHeight * 0.4); burst(180, window.innerWidth * 0.7, window.innerHeight * 0.4); }, 200);
+  }
+
+  /* ==================== KONTROL: DRAG & TAP ==================== */
+  var tray = $('trayItem');
+  function ensureUnlock() { actx(); }
+  tray.addEventListener('pointerdown', function (e) {
+    var el = $('theItem');
+    if (locked || !el || !el.contains(e.target)) return;
+    e.preventDefault(); ensureUnlock();
+    drag = { id: e.pointerId, x: e.clientX, y: e.clientY, moved: false, ghost: null };
+    try { tray.setPointerCapture(e.pointerId); } catch (er) {}
+  });
+  tray.addEventListener('pointermove', function (e) {
+    if (!drag || e.pointerId !== drag.id) return;
+    if (!drag.moved && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 8) {
+      drag.moved = true;
+      var g = document.createElement('div');
+      g.className = 'ghost'; g.innerHTML = itemSvg(Q[idx].item, 90);
+      document.body.appendChild(g); drag.ghost = g;
+      $('theItem').classList.add('dragging');
+      setSelected(false);
+    }
+    if (drag.ghost) { drag.ghost.style.left = e.clientX + 'px'; drag.ghost.style.top = e.clientY + 'px'; }
+  });
+  function endDrag(e, cancel) {
+    if (!drag || e.pointerId !== drag.id) return;
+    var d = drag; drag = null;
+    try { tray.releasePointerCapture(e.pointerId); } catch (er) {}
+    var el = $('theItem');
+    if (d.ghost && d.ghost.parentNode) d.ghost.parentNode.removeChild(d.ghost);
+    if (el) el.classList.remove('dragging');
+    if (cancel) return;
+    if (d.moved) {
+      lastDrag = Date.now();
+      var p = toSvg(e.clientX, e.clientY);
+      if (p) answer(p.x, p.y);
+      else $('hint').textContent = 'Ayo lepaskan bendanya di dalam gambar ruangan ya!';
+    } else if (!locked) {
+      setSelected(!selected);
+    }
+  }
+  tray.addEventListener('pointerup', function (e) { endDrag(e, false); });
+  tray.addEventListener('pointercancel', function (e) { endDrag(e, true); });
+
+  $('room').addEventListener('click', function (e) {
+    if (Date.now() - lastDrag < 400 || locked) return;
+    if (!selected) { $('hint').textContent = 'Pilih dulu bendanya di nampan, lalu ketuk tempat tujuan.'; return; }
+    var p = toSvg(e.clientX, e.clientY);
+    if (p) answer(p.x, p.y);
+  });
+
+  /* ==================== TOMBOL ==================== */
+  $('inName').addEventListener('input', function () { $('btnStart').disabled = !this.value.trim(); });
+  $('inName').addEventListener('keydown', function (e) { if (e.key === 'Enter' && this.value.trim()) startGame(); });
+  $('btnStart').addEventListener('click', startGame);
+  $('btnMateri').addEventListener('click', function () { openModal('modalMateri'); });
+  $('btnLB').addEventListener('click', function () { renderLB(); openModal('modalLB'); });
+  $('btnExit').addEventListener('click', function () {
+    if (window.confirm('Keluar dari permainan? Nilaimu belum tersimpan.')) {
+      clearInterval(tInt); clearTimeout(nextT); locked = true;
+      show('screenStart');
+    }
+  });
+  $('btnMute').addEventListener('click', function () {
+    muted = !muted;
+    this.textContent = muted ? '🔇 Suara: Mati' : '🔊 Suara: Hidup';
+  });
+
+  buildMateri();
+})();
+</script>
+</body>
+</html>
